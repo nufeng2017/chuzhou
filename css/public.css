@@ -1,0 +1,153 @@
+body,html{
+	height: 100%;
+	background: #fff;
+}
+/*头部标题*/
+.hui-head{
+	height:5.45rem;
+	line-height: 5.45rem;
+	text-align: center;
+	background: #2a3c88;
+	color:#fff;
+	font-size:1.8rem;
+}
+.hui-head span{
+	margin: 0 0.325rem;	
+}
+
+/*首页logo*/
+.hui-logo{
+	margin-top: 1.75rem;
+}
+.hui-logo img{
+	width:11.35rem;
+	display: block;
+	margin: 0 auto;
+}
+
+/*表格*/
+.hui-form{
+	margin: 1.25rem 3.5rem 1.3rem;
+}
+.hui-form .hui-form-item{
+	font-size:0.923rem;
+	color:#000;
+	padding-left: 1.65rem;
+	height: 2.95rem;
+	line-height: 2.95rem;
+	border-bottom: 1px solid #dadada;
+}
+.hui-form .hui-form-item:first-child{
+	border-top: 1px solid #dadada;
+}
+.hui-form .hui-form-item label{
+	width:5rem;
+}
+.hui-form .hui-form-item .hui-form-box{
+	height: 100%;
+	position: relative;
+}
+.hui-form .hui-form-item .hui-form-box input,.hui-form .hui-form-item .hui-form-box div{
+	width:100%;
+	height: 100%;
+	display: block;
+	font-size:0.923rem;
+	color:#000;
+	line-height: 2.95rem;
+}
+.hui-form .hui-form-item .hui-form-box .hui-get-code{
+	font-size:0.678rem;
+	color:#d0d0d0;
+	width:5rem !important;
+	height: 1.6rem;
+	border:1px solid #d0d0d0;
+	line-height: 1.6rem;
+	border-radius: 0.5rem;
+	position: absolute;
+	top:0.6rem;
+	right: 0;
+	background: #fff;
+	text-align: center;
+}
+
+/*提交提醒*/
+.hui-submit-tips{
+	color:#a2a2a2;
+	font-size:0.767rem;
+	text-align: center;
+	line-height: 2;
+	margin-bottom: 1rem;
+}
+
+/*提交按钮*/
+.hui-submit-btn{
+	width:14.825rem;
+	font-size:1.226rem;
+	color:#fff;
+	background: #2a3c88;
+	text-align: center;
+	line-height: 2.9rem;
+	height: 2.9rem;
+	margin: 0 auto;
+	border-radius: 0.5rem;
+	margin-bottom: 4.8rem;
+}
+.hui-submit-btn span{
+	margin-right: 2rem;
+}
+
+/*底部按钮*/
+.hui-bottom-btn{
+	color:#fff;
+	font-size:0.776rem;
+	height: 3.3rem;
+	line-height: 3.3rem;
+	position: fixed;
+	width:100%;
+	left: 0;
+	bottom: 0;
+	background: #2a3c88;
+	text-align: center;
+}
+.hui-bottom-btn span{
+	margin: 0 0.275rem;
+}
+
+/*弹窗*/
+.hui-primary{
+	background: #2a3c88 !important;
+}
+.hui-success-img img{
+	width:12.5rem;
+	display: block;
+	margin: 2.5rem auto 1.5rem;
+}
+
+/*帮助信息*/
+.hui-help-box{
+	margin: 1.5rem 2rem 4.45rem;
+	font-size:0.597rem;
+	color:#414141;
+	border: 1px solid #848484;
+	background: #eaeaea;
+	padding: 3.325rem 1.85rem 3.325rem ;
+}
+.hui-help-box .hui-help-content p{
+	margin-bottom: 0.9rem;
+}
+.hui-help-box .hui-help-content p span{
+	display: inline-block;
+	height: 0.597rem;
+	width:1.56rem;
+}
+.hui-help-box .hui-help-know-btn{
+	margin: 3rem auto 0;
+	width:8.15rem;
+	background: #2a3c88;
+	border-radius: 0.5rem;
+	color:#fff;
+	text-align: center;
+	height: 2.15rem;
+	line-height: 2.15rem;
+	font-size:0.925rem;
+}
