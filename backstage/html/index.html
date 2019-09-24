@@ -42,6 +42,63 @@
 			    </div>
 			</div>
 		</form>
+		<script id="z-demo" type="text/html">
+			<form class="layui-form" action="" style="padding-top: 20px;">
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">姓名</label>
+						<div class="layui-input-inline">
+							<input type="text" name="username" lay-verify="" autocomplete="off" class="layui-input" value={{d.username}}>
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">身份证号</label>
+						<div class="layui-input-inline">
+							<input type="text" name="idcard" lay-verify="" autocomplete="off" class="layui-input" value={{d.idcard}}>
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">预约时间</label>
+						<div class="layui-input-inline">
+							<input type="text" name="reservation_time" id="date1"  placeholder="{{d.reservation_time}}" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">手机号码</label>
+						<div class="layui-input-inline">
+							<input type="text" name="telphone" lay-verify="" autocomplete="off" class="layui-input" value={{d.telphone}}>
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">状态</label>
+					    <div class="layui-input-inline">
+					    	{{#  if(d.status=='未联系'){ }}
+					      		<input type="radio" name="status" value="未联系" title="未联系" checked>
+					      	{{#  } else { }}
+					      		<input type="radio" name="status" value="未联系" title="未联系">
+					      	{{#  } }}  
+					      	{{#  if(d.status=='已联系'){ }}
+					      		<input type="radio" name="status" value="已联系" title="已联系" checked>
+					      	{{#  } else { }}
+					      		<input type="radio" name="status" value="已联系" title="已联系">
+					      	{{#  } }}  
+					    </div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">备注</label>
+						<div class="layui-input-inline">
+							<input type="text" name="remark" lay-verify="" autocomplete="off" class="layui-input" value={{d.remark}}>
+						</div>
+					</div>
+				</div>
+				<div class="layui-form-item">
+				    <div class="layui-input-block">
+				      	<button type="button"  data-type="reload" class="layui-btn selectAll" lay-submit="" lay-filter="*">确定</button>
+				    </div>
+				</div>
+			</form>
+		</script>
+		<div id="z-view" style="display: none;"></div>
 		<table class="layui-hide" id="test"  lay-filter="test"></table>
 		<script type="text/html" id="barDemo">
 			<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>
@@ -49,9 +106,10 @@
 		<script src="../src/layui/layui.js" charset="utf-8"></script>
 		<script src="../../js/jquery-3.4.1.min.js" charset="utf-8"></script>
 		<script>
-			layui.use(['table','form', 'layedit', 'laydate'], function() {
+			layui.use(['table','form','laytpl','layedit', 'laydate'], function() {
 				var table = layui.table;
 				var util = layui.util;
+				var laytpl = layui.laytpl;
 				var form = layui.form,layer = layui.layer,layedit = layui.layedit,laydate = layui.laydate;
 				//日期
 			  	laydate.render({
@@ -59,7 +117,7 @@
 			  	});
 				table.render({
 					elem: '#test',
-					url: '../adminList.php',
+					//url: '../adminList.php',
 					title: '用户数据表',
 					cols: [
 						[{
@@ -99,7 +157,6 @@
 						}, {
 							field: 'remark',
 							title: '备注信息',
-							width: 100
 						}, {
 							field: 'addtime',
 							title: '提交时间',
@@ -109,9 +166,10 @@
 							fixed: 'right',
 							title: '操作',
 							toolbar: '#barDemo',
-							width: 150
+							width: 80
 						}]
 					],
+					data:[{"id":1,username:111,"idcard":123131312312321123,"reservation_time":'2019-08-09',"telphone":'17366009087',"status":'未联系',"remark":'萨芬萨芬的算法撒地方撒地方'}],
 					page: true,
 					id:'textreload'
 				});
@@ -161,21 +219,32 @@
 					return;
 				})
 
-
+				var getTpl = document.getElementById('z-demo').innerHTML,view = document.getElementById('z-view');
 				//监听行工具事件
+				var tableObj;
 				table.on('tool(test)', function(obj) {
+					tableObj = obj;
 					var data = obj.data;
 					if(obj.event === 'edit') {
-						layer.prompt({
-							formType: 2,
-							value: data.email
-						}, function(value, index) {
-							obj.update({
-								email: value
-							});
-							layer.close(index);
+						laytpl(getTpl).render(data, function(html){
+							view.innerHTML = html;
+			  				form.render();
+			  				laydate.render({
+			    				elem: '#date1'
+			  				});
+						});
+						layer.open({
+						  	type: 1, 
+						  	title:'编辑',
+						  	content: $('#z-view')
 						});
 					}
+				});
+				form.on('submit(*)', function(data){
+					console.log(data.field)
+					tableObj.update(data.field);
+					layer.closeAll();
+					return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
 				});
 			});
 		</script>
