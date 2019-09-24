@@ -6,7 +6,7 @@
 		<link rel="stylesheet" href="../src/layui/css/layui.css" />
 	</head>
 	<body>
-		<form class="layui-form" action="" style="margin:20% auto;width:340px">
+		<form class="layui-form" action="../adminController.php" method="post" style="margin:20% auto;width:340px">
 			<div class="layui-form-item">
 				<div class="layui-inline">
 					<label class="layui-form-label">用户名</label>
@@ -19,7 +19,7 @@
 				<div class="layui-inline">
 					<label class="layui-form-label">密码</label>
 					<div class="layui-input-inline">
-						<input type="text" name="number" lay-verify="required|number" autocomplete="off" class="layui-input">
+						<input type="text" name="password" lay-verify="required|number" autocomplete="off" class="layui-input">
 					</div>
 				</div>
 			</div>
@@ -30,4 +30,12 @@
 			</div>
 		</form>
 	</body>
+	<script type="text/javascript" src="/js/jquery-3.4.1.min.js"></script>
 </html>
+<script>
+	$(function () {
+
+
+
+	})
+</script>
