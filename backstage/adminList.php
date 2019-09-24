@@ -1,67 +1,93 @@
 <?php
 include "../pdo.php";
+header('Content-type:text/html; charset=utf-8');
+// 开启Session
+session_start();
+
+// 首先判断Cookie是否有记住了用户信息
+if (isset($_COOKIE['username'])) {
+    # 若记住了用户信息,则直接传给Session
+    $_SESSION['username'] = $_COOKIE['username'];
+    $_SESSION['islogin'] = 1;
+}
+if (!isset($_SESSION['islogin'])) {
+    echo  json_encode(['code'=>400,'msg'=>'请先登录！']);exit();
+}
 
 $username         = isset($_GET['username']) ? $_GET['username'] : '';
 $idcard           = isset($_GET['idcard']) ? $_GET['idcard'] : '';
 $reservation_time = isset($_GET['reservation_time']) ? $_GET['reservation_time'] : '';
+$times            = isset($_GET['times']) ? $_GET['times'] : '';
 $telphone         = isset($_GET['telphone']) ? $_GET['telphone'] : '';
-$action           = isset($_GET['action']) ? $_GET['action'] : '';
-$id               = isset($_TPOS['id']) ? $_POST['id'] : '';
+$status           = isset($_GET['status']) ? $_GET['status'] : '';
+$remark           = isset($_GET['remark']) ? $_GET['remark'] : '';
+$action           = isset($_GET['action']) ? $_GET['action'] : 'selectall';
+$id               = isset($_GET['id']) ? $_GET['id'] : '';
+
+if ($action=='selectall'){
+
+    $sql = 'select * from  reservation  ';
+    $where = '  where 1=1  ';
+    if (!empty($username)){
+        $where.=" and username like '%".$username."%'";
+    }
+    if (!empty($idcard)){
+        $where.=" and idcard='$idcard'";
+    }
+
+    if (!empty($reservation_time)){
+        $where.=' and  reservation_time LIKE  "%'.$reservation_time.'%"';
+    }
+    if (!empty($telphone)){
+        $where.=" and telphone='$telphone'";
+    }
+
+    $sqltotal = 'select * from reservation  '.$where;
+    $totalData = DB::getStmt($sqltotal);
+    $totalData->execute();
+    $totalnum = $totalData->fetchAll(PDO::FETCH_ASSOC);
+    $total = count($totalnum);
+
+    $num = 20;
+    $cpage = isset($_GET['page'])?$_GET['page']:1;
+    $limit = isset($_GET['limit'])?$_GET['limit']:'';
+    /**
+    $pagenum = ceil($total/$num);
+    $offset = ($cpage-1)*$num;
+     **/
+    $offset = ($cpage-1)*$limit;
+
+    $where.="    ORDER BY addtime DESC limit $offset,$limit";
+
+    $stmt = DB::getStmt($sql.$where);
+
+    $stmt->execute();
+    $dbDatas=$stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    /**
+    $start = $offset+1;
+    $end=($cpage==$pagenum)?$total : ($cpage*$num);//结束记录页
+    $next=($cpage==$pagenum)? 0:($cpage+1);//下一页
+    $prev=($cpage==1)? 0:($cpage-1);//前一页
+     **/
+
+    $dbData['code']=0;
+    $dbData['msg']=200;
+    $dbData['count']=$total;
+    $dbData['data']=$dbDatas;
+
+    echo json_encode($dbData);exit();
 
 
-$sql = 'select * from  reservation where 1=1 ';
-if (!empty($username)){
-    $sql.=" and username like '%".$username."%'";
 }
-if (!empty($idcard)){
-    $sql.=" and idcard='$idcard'";
-}
 
-if (!empty($reservation_time)){
-    $sql.=' and  reservation_time LIKE  "%'.$reservation_time.'%"';
-}
-if (!empty($telphone)){
-    $sql.=" and telphone='$telphone'";
-}
-
-
-$totalData = DB::getStmt('select * from reservation;');
-$totalData->execute();
-$totalnum = $totalData->fetchAll(PDO::FETCH_ASSOC);
-$total = count($totalnum);
-
-$num = 20;
-$cpage = isset($_GET['page'])?$_GET['page']:1;
-$limit = isset($_GET['limit'])?$_GET['limit']:'';
-//$pagenum = ceil($total/$num);
-//$offset = ($cpage-1)*$num;
-
-$offset = ($cpage-1)*$limit;
-
-$sql.="    ORDER BY addtime DESC limit $offset,$limit";
-
-$stmt = DB::getStmt($sql);
-
-$stmt->execute();
-$dbDatas=$stmt->fetchAll(PDO::FETCH_ASSOC);
-$totala = count($dbDatas);
-//$start = $offset+1;
-//$end=($cpage==$pagenum)?$total : ($cpage*$num);//结束记录页
-//$next=($cpage==$pagenum)? 0:($cpage+1);//下一页
-//$prev=($cpage==1)? 0:($cpage-1);//前一页
-
-$dbData['code']=0;
-$dbData['msg']=200;
-$dbData['count']=$totala;
-$dbData['data']=$dbDatas;
-
-echo json_encode($dbData);die;
 
 
 /**
  * 进行修改操作
  */
 if ($action=='update'){
+
     if (empty($username)){
         echo  json_encode(['code'=>400,'msg'=>'请输入姓名！']);
         exit();
@@ -70,11 +96,15 @@ if ($action=='update'){
         echo  json_encode(['code'=>400,'msg'=>'请输入身份证号！']);
         exit();
     }
-    if(!empty($telphone) && !preg_match('/^1([0-9]{9})/',$telphone)){
-        echo  json_encode(['code'=>400,'msg'=>'请输入正确的手机号码！']);
+//    if(!empty($telphone) && count($telphone)<11){
+//        echo  json_encode(['code'=>400,'msg'=>'请输入正确的手机号码！']);
+//        exit();
+//    }
+    if (empty($reservation_time)) {
+        echo json_encode(['code' => 400, 'msg' => '请输入时间！']);
         exit();
     }
-    if (empty($reservation_time)) {
+    if (empty($times)) {
         echo json_encode(['code' => 400, 'msg' => '请输入时间！']);
         exit();
     }
@@ -82,19 +112,25 @@ if ($action=='update'){
         echo json_encode(['code' => 400, 'msg' => '缺少系统参数！']);
         exit();
     }
-    $sql = "update reservation set  username=:username,idcard=:idcard,reservation_time=:reservation_time,telphone=:telphone where `id`=:id;";
+
+    $weekarray = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"];
+    $week      = $weekarray[date("w",strtotime("$reservation_time"))];
+    $reservation_time = $reservation_time.'/'.$week.'/'.$times;
+
+    $sql = "update reservation set  username=:username,idcard=:idcard,reservation_time=:reservation_time,telphone=:telphone,status=:status,remark=:remark where `id`=:id;";
     $stmt = DB::getStmt($sql);
     //传参执行
-    if($stmt->execute(['username'=>$username,'idcard'=>$idcard,'reservation_time'=>$reservation_time,'telphone'=>$telphone,'id'=>$id])){
+    if($stmt->execute(['username'=>$username,'idcard'=>$idcard,'reservation_time'=>$reservation_time,'telphone'=>$telphone,'status'=>$status,'remark'=>$remark,'id'=>$id])){
         //是否修改成功
         if($stmt->rowCount() > 0 ){//受影响记录是否>0
-            echo '<h3>成功修改了',$stmt->rowCount(),'条数据</h3>';exit();
+            echo json_encode(['code' => 200, 'msg' => '修改成功！']);
+            exit();
         }else{
-            echo '无修改';
-            print_r($stmt->errorInfo());//返回修改错误信息
+            echo json_encode(['code' => 400, 'msg' =>$stmt->errorInfo()]);
+            exit();
         }
     }else{
-        print_r($stmt->errorInfo());//返回执行错误信息
+        echo json_encode(['code' => 400, 'msg' =>$stmt->errorInfo()]);
         exit();
     }
 

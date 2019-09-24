@@ -72,46 +72,57 @@
 </html>
 
 <script>
+	/** 未来七天的工作日  去除周六周日**/
+	function getworkday(dat,itervalByDay){
+		var str=dat.split("-");
+		var date=new Date();
+		date.setUTCFullYear(str[0], str[1] - 1, str[2]);
+		date.setUTCHours(0, 0, 0, 0);
+		var millisceonds =date.getTime();
+		for(var i=1;i<=itervalByDay;i++){
+			millisceonds +=24*60*60*1000;
+			date.setTime(millisceonds);
+			if(date.getDay()==0||date.getDay()==6) i--;
+		}
+		var year = date.getFullYear();
+		var month = date.getMonth() + 1;
+		var day = date.getDate();
+		month = ('00'+month).slice(-2);
+		day = ('00'+day).slice(-2);
+		var rq = year + "-" +  month + "-" + day;
+		return rq;
+	}
+
+	//返回星期几
+	function getday(dats,itervalByDays){
+		var str=dats.split("-");
+		var date=new Date();
+		date.setUTCFullYear(str[0], str[1] - 1, str[2]);
+		date.setUTCHours(0, 0, 0, 0);
+		var millisceondss =date.getTime();
+		for(var i=1;i<=itervalByDays;i++){
+			millisceondss +=24*60*60*1000;
+			date.setTime(millisceondss);
+			if(date.getDay()==0||date.getDay()==6) i--;
+		}
+		var days = date.getDay();
+		var rqs = days;
+		return rqs;
+	}
+
+	let obj=[],Days=["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+	var now = new Date();
+	var year = now.getFullYear(); //得到年份
+	var month = now.getMonth()+1;//得到月份
+	var date = now.getDate()+1;
+	var Nowadays = year+'-'+month+'-'+date;
+	for(var i = 0 ; i < 7 ; i++){
+		var str = Days[getday(Nowadays,i)];
+		obj.push({value:getworkday(Nowadays,i)+'/'+str,text:getworkday(Nowadays,i)+'/'+str});
+		obj[i].children = [{value:'8:30-9:00',text:'8:30-9:00'},{value:'9:00-9:30',text:'9:00-9:30'},{value:'9:30-10:00',text:'9:30-10:00'},{value:'10:00-10:30',text:'10:00-10:30'},{value:'10:30-11:00',text:'10:30-11:00'},{value:'11:00-11:30',text:'11:00-11:30'},{value:'11:30-12:00',text:'11:30-12:00'},{value:'14:00-14:30',text:'14:00-14:30'},{value:'14:30-15:00',text:'14:30-15:00'},{value:'15:00-15:30',text:'15:00-15:30'},{value:'15:30-16:00',text:'15:30-16:00'},{value:'16:00-16:30',text:'16:00-16:30'},{value:'16:30-17:00',text:'16:30-17:00'}];
+	}
+	/**未来七天的工作日  去除周六周日  **/
 	$(function () {
-		var a =
-		console.log(a);
-
-		let obj=[],Days=['星期一','星期二','星期三','星期四','星期五','星期六','星期日'],curreDate=new Date();
-		var now = new Date();
-		var nowTime = now.getTime() ;
-		var oneDayTime = 24*60*60*1000 ;
-		for(var i = 0 ; i < 7 ; i++){
-			//显示周一
-			var ShowTime = nowTime + (i+1)*oneDayTime ;
-			//初始化日期时间
-			var myDate = new Date(ShowTime);
-			var year=myDate.getFullYear();
-			var month=myDate.getMonth()+1;
-			month = ('00'+month).slice(-2);
-			var date=myDate.getDate();
-			date = ('00'+date).slice(-2);
-			// console.log(year+"-"+month+"-"+date)
-			var str = "星期" + "日一二三四五六".charAt(myDate.getDay());
-			obj.push({value:year+"."+month+"."+date+"/"+str,text:year+"."+month+"."+date+"/"+str});
-			obj[i].children = [{value:'8:30-9:00',text:'8:30-9:00'},{value:'9:00-9:30',text:'9:00-9:30'},{value:'9:30-10:00',text:'9:30-10:00'},{value:'10:00-10:30',text:'10:00-10:30'},{value:'10:30-11:00',text:'10:30-11:00'},{value:'11:00-11:30',text:'11:00-11:30'},{value:'11:30-12:00',text:'11:30-12:00'},{value:'14:00-14:30',text:'14:00-14:30'},{value:'14:30-15:00',text:'14:30-15:00'},{value:'15:00-15:30',text:'15:00-15:30'},{value:'15:30-16:00',text:'15:30-16:00'},{value:'16:00-16:30',text:'16:00-16:30'},{value:'16:30-17:00',text:'16:30-17:00'}];
-		}
-
-		/**
-		for(let i=0;i<7;i++){
-			let dd = curreDate;
-			dd.setDate(dd.getDate()+i);//获取AddDayCount天后的日期
-
-			var tYear = dd.getFullYear();
-			var tMonth = dd.getMonth();
-			var tDate = dd.getDate();
-			tMonth = doHandleMonth(tMonth + 1);
-			tDat = doHandleMonth(tDate);
-			obj.push(tDat);
-			// obj.push({value:tYear+"."+tMonth+"."+tDate+"/"+Days[dd.getDay()],text:tYear+"."+tMonth+"."+tDate+"/"+Days[dd.getDay()]});
-			// obj[i].children = [{value:'8:30-9:00',text:'8:30-9:00'},{value:'9:00-9:30',text:'9:00-9:30'},{value:'9:30-10:00',text:'9:30-10:00'},{value:'10:00-10:30',text:'10:00-10:30'},{value:'10:30-11:00',text:'10:30-11:00'},{value:'11:00-11:30',text:'11:00-11:30'},{value:'11:30-12:00',text:'11:30-12:00'},{value:'14:00-14:30',text:'14:00-14:30'},{value:'14:30-15:00',text:'14:30-15:00'},{value:'15:00-15:30',text:'15:00-15:30'},{value:'15:30-16:00',text:'15:30-16:00'},{value:'16:00-16:30',text:'16:00-16:30'},{value:'16:30-17:00',text:'16:30-17:00'}];
-		}
-**/
-
         /* 普通选择器 非关联型绑定 */
 		var picker1 = new huiPicker('#btn1', function(){
 			var val = picker1.getVal(0);
