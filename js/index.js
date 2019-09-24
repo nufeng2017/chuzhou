@@ -28,6 +28,7 @@ var picker1 = new huiPicker('#btn1', function(){
     var txt1 = picker1.getText(1);
     hui('#btn1 .hui-form-box>div').html(txt+'/'+txt1);
 });
+
 var data = [{
 	value:'2019.9.23/星期一 ',
 	text:'2019.9.23/星期一',
