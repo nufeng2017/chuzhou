@@ -101,7 +101,7 @@ if ($action=='update'){
 //        exit();
 //    }
     if (empty($reservation_time)) {
-        echo json_encode(['code' => 400, 'msg' => '请输入时间！']);
+        echo json_encode(['code' => 400, 'msg' => '请输入日期！']);
         exit();
     }
     if (empty($times)) {
@@ -112,15 +112,17 @@ if ($action=='update'){
         echo json_encode(['code' => 400, 'msg' => '缺少系统参数！']);
         exit();
     }
-
+    $days = $reservation_time;
     $weekarray = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"];
     $week      = $weekarray[date("w",strtotime("$reservation_time"))];
     $reservation_time = $reservation_time.'/'.$week.'/'.$times;
+    $days = strtotime($days);
 
-    $sql = "update reservation set  username=:username,idcard=:idcard,reservation_time=:reservation_time,telphone=:telphone,status=:status,remark=:remark where `id`=:id;";
+
+    $sql = "update reservation set  username=:username,idcard=:idcard,reservation_time=:reservation_time,date=:date,times=:times,telphone=:telphone,status=:status,remark=:remark where `id`=:id;";
     $stmt = DB::getStmt($sql);
     //传参执行
-    if($stmt->execute(['username'=>$username,'idcard'=>$idcard,'reservation_time'=>$reservation_time,'telphone'=>$telphone,'status'=>$status,'remark'=>$remark,'id'=>$id])){
+    if($stmt->execute(['username'=>$username,'idcard'=>$idcard,'reservation_time'=>$reservation_time,'date'=>$days,'times'=>$times,'telphone'=>$telphone,'status'=>$status,'remark'=>$remark,'id'=>$id])){
         //是否修改成功
         if($stmt->rowCount() > 0 ){//受影响记录是否>0
             echo json_encode(['code' => 200, 'msg' => '修改成功！']);

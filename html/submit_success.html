@@ -2,7 +2,7 @@
 <html>
 
 	<head>
-		<meta charset="utf-8">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
 		<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
 		<link rel="stylesheet" type="text/css" href="../css/public/hui.css" />
@@ -27,28 +27,44 @@
 			<div class="hui-form-item hui-flex hui-flex-align-center">
 				<label for="" class="hui-flex hui-flex-justify"><span>姓</span><span>名：</span></label>
 				<div class="hui-form-box hui-flex-item">
-					<div>11</div>
+					<div id="username"></div>
 				</div>
 			</div>
 			<div class="hui-form-item hui-flex hui-flex-align-center">
 				<label for="" class="hui-flex hui-flex-justify"><span>身</span><span>份</span><span>证</span><span>号：</span></label>
 				<div class="hui-form-box hui-flex-item">
-					<div>11</div>
+					<div id="idcard"></div>
 				</div>
 			</div>
 			<div class="hui-form-item hui-flex hui-flex-align-center" id="btn1">
 				<label for="" class="hui-flex hui-flex-justify"><span>预</span><span>约</span><span>时</span><span>间：</span></label>
 				<div class="hui-form-box hui-flex-item">
-					<div>11</div>
+					<div id="time"></div>
 				</div>
 			</div>
 			<div class="hui-form-item hui-flex hui-flex-align-center">
 				<label for=""class="hui-flex hui-flex-justify"><span>手</span><span>机</span><span>号：</span></label>
 				<div class="hui-form-box hui-flex-item">
-					<div>11</div>
+					<div id="telphone"></div>
 				</div>
 			</div>
 		</div>
 		
 	</body>
 </html>
+
+<script>
+	let res = {},query=window.location.href.split(/\?(?!.*\?)/)[1];
+	if(query){
+		let arr =query.split("&");
+		for(let i = 0, len = arr.length; i < len; i++){
+			res[arr[i].split("=")[0]] = arr[i].split("=")[1]
+		}
+	}
+	document.getElementById("username").innerHTML = res.username;
+	document.getElementById("idcard").innerHTML = res.idcard;
+	document.getElementById("time").innerHTML = decodeURI(res.time);
+	document.getElementById("telphone").innerHTML = res.telphone;
+
+
+</script>

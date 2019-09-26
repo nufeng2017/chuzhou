@@ -5,7 +5,7 @@ for($i=1;$i<8;$i++){
 };
 $date = get_date($dateArray);//调用函数
 
-echo  json_encode($date);
+//echo  json_encode($date);
 
 /*
     * 返回输入日期数组对应的星期和日期
@@ -36,4 +36,38 @@ function get_week($date){
     $weekArr=array("周日","周一","周二","周三","周四","周五","周六");
     return $weekArr[$number_wk];
 
+}
+
+
+function createSign()
+{
+    $str = "0123456789";
+    $sign = '';
+    $length = strlen($str)-1;
+
+    for($i=0; $i<4; $i++) {
+        $num = rand(0,$length);
+        $sign .= $str[$num];
+    }
+
+    return $sign;
+}
+
+function doGet($url)
+{
+    //初始化
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL,$url);
+    // 执行后不直接打印出来
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HEADER, false);
+    // 跳过证书检查
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    // 不从证书中检查SSL加密算法是否存在
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    //执行并获取HTML文档内容
+    $output = curl_exec($ch);
+    //释放curl句柄
+    curl_close($ch);
+    return $output;
 }
