@@ -18,11 +18,16 @@ if ($action=='add'){
     }
     if (empty($param['idcard'])){
         echo  json_encode(['code'=>400,'msg'=>'请输入身份证号！']);exit();
+    }elseif (!preg_match("/^\d{15}|\d{18}$/", $param['idcard'])){
+        echo  json_encode(['code'=>400,'msg'=>'请输入正确的身份证号！']);exit();
     }
     if (empty($param['time'])){
         echo  json_encode(['code'=>400,'msg'=>'请输入预约时间！']);exit();
     }
+    $check = '/^(1(([35789][0-9])|(47)))\d{8}$/';
     if(empty($param['telphone'])){
+        echo  json_encode(['code'=>400,'msg'=>'请输入正确的手机号码！']);exit();
+    }elseif (!preg_match($check, $param['telphone'])){
         echo  json_encode(['code'=>400,'msg'=>'请输入正确的手机号码！']);exit();
     }
     if (empty($param['code'])){

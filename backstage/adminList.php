@@ -4,6 +4,11 @@ header('Content-type:text/html; charset=utf-8');
 // 开启Session
 session_start();
 
+$contactStatus=array(
+    0=>'',
+    1=>'已联系',
+    2=>'未联系'
+);
 // 首先判断Cookie是否有记住了用户信息
 if (isset($_COOKIE['username'])) {
     # 若记住了用户信息,则直接传给Session
@@ -75,7 +80,6 @@ if ($action=='selectall'){
     $dbData['msg']=200;
     $dbData['count']=$total;
     $dbData['data']=$dbDatas;
-
     echo json_encode($dbData);exit();
 
 
@@ -87,7 +91,10 @@ if ($action=='selectall'){
  * 进行修改操作
  */
 if ($action=='update'){
-
+    if (empty($id)){
+        echo json_encode(['code' => 400, 'msg' => '缺少系统参数！']);
+        exit();
+    }
     if (empty($username)){
         echo  json_encode(['code'=>400,'msg'=>'请输入姓名！']);
         exit();
@@ -96,10 +103,11 @@ if ($action=='update'){
         echo  json_encode(['code'=>400,'msg'=>'请输入身份证号！']);
         exit();
     }
-//    if(!empty($telphone) && count($telphone)<11){
-//        echo  json_encode(['code'=>400,'msg'=>'请输入正确的手机号码！']);
-//        exit();
-//    }
+    $check = '/^(1(([35789][0-9])|(47)))\d{8}$/';
+    if(!empty($telphone) && !preg_match($check, $telphone)){
+        echo  json_encode(['code'=>400,'msg'=>'请输入正确的手机号码！']);
+        exit();
+    }
     if (empty($reservation_time)) {
         echo json_encode(['code' => 400, 'msg' => '请输入日期！']);
         exit();
@@ -108,15 +116,22 @@ if ($action=='update'){
         echo json_encode(['code' => 400, 'msg' => '请输入时间！']);
         exit();
     }
-    if (empty($id)){
-        echo json_encode(['code' => 400, 'msg' => '缺少系统参数！']);
-        exit();
-    }
     $days = $reservation_time;
     $weekarray = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"];
     $week      = $weekarray[date("w",strtotime("$reservation_time"))];
     $reservation_time = $reservation_time.'/'.$week.'/'.$times;
     $days = strtotime($days);
+
+    $Agreement = DB::getStmt("select * from  reservation where reservation_time=:reservation_time");
+
+    $Agreement->bindParam(':reservation_time',$reservation_time);
+    $Agreement->execute();
+    $a=$Agreement->fetch(PDO::FETCH_ASSOC);
+    if ($a){
+        echo  json_encode(['code'=>400,'msg'=>'请重新选择预约时间！']);
+        exit();
+    }
+
 
 
     $sql = "update reservation set  username=:username,idcard=:idcard,reservation_time=:reservation_time,date=:date,times=:times,telphone=:telphone,status=:status,remark=:remark where `id`=:id;";

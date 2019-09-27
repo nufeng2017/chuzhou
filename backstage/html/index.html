@@ -189,7 +189,16 @@
 						}, {
 							field: 'status',
 							title: '状态',
-							width: 100
+							width: 100,
+							templet: function(res) {
+								if (res.status==1){
+									return '<span>已联系</span>'
+								} else if (res.status==2){
+									return '<span>未联系</span>'
+								}else if (res.status==0){
+									return '<span> </span>'
+								}
+							}
 						}, {
 							field: 'remark',
 							title: '备注信息',
@@ -212,7 +221,7 @@
 
 
 
-				//查询条件返回结果
+		//查询条件返回结果
 				var $=layui.$,active={
 					reload:function(){
 						var username =$("input[name='username']").val();
@@ -287,12 +296,12 @@
 				form.on('submit(*)', function(data){
 					// console.log(data.field)
 					// tableObj.update(data.field);
-					var telephone = data.field.telphone;
-					var len = telephone.length;
-					if (len<11) {
-						layer.msg('错误手机号！');
-						return  false;
-					}
+					// var telephone = data.field.telphone;
+					// var len = telephone.length;
+					// if (len<11) {
+					// 	layer.msg('错误手机号！');
+					// 	return  false;
+					// }
 					$.ajax({
 						type: "get",
 						dataType: "json",
