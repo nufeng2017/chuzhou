@@ -95,8 +95,8 @@ if ($action=='send'){
     $telphone = isset($_POST['telphone'])?$_POST['telphone']:"";
     $url = 'http://mysms.house365.com:81/index.php/Interface/apiSendMobil/jid/148/depart/1/city/chuzhou/mobileno/'.$telphone.'/?msg=您的验证码是 【'.$codes.'】';
     $mas = doGet("$url");
-    $_SESSION[$telphone] = $codes;
     if ($mas){
+        $_SESSION[$telphone] = $codes;
         echo  json_encode(['code'=>200,'msg'=>'短信已发送，请查收！']);
         exit();
     }else{

@@ -19,11 +19,9 @@ $a=$stmt->fetch(PDO::FETCH_ASSOC);
 if (empty($a)){
     echo "没有此用户！";
 }else{
-
-    # 用户名和密码都正确,将用户信息存到Session中
+    //用户名和密码都正确,将用户信息存到Session中
     $_SESSION['username'] = $a['username'];
     $_SESSION['islogin'] = 1;
-    setcookie('username', $username, time()+1*24*60*60);
-
+    setcookie('username', $a['username'], time()+1*24*60*60);
     echo "<script> window.location.href='./html/index.html';</script>";
 }
