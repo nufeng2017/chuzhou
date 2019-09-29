@@ -58,9 +58,9 @@
 						</div>
 					</div>
 					<div class="layui-inline">
-						<label class="layui-form-label">预约时间</label>
+						<label class="layui-form-label">预约日期</label>
 						<div class="layui-input-inline">
-							<input type="text" name="reservation_time" id="date1"  placeholder="{{d.reservation_time}}" autocomplete="off" class="layui-input">
+							<input type="text" name="reservation_time" id="date1" value="2019-06-25"  placeholder="{{d.reservation_time}}" autocomplete="off" class="layui-input">
 						</div>
 					</div>
 					<div class="layui-inline">
@@ -94,14 +94,11 @@
 					    <div class="layui-input-inline">
 					    	{{#  if(d.status=='2'){ }}
 					      		<input type="radio" name="status" value="2" title="未联系" checked>
+								<input type="radio" name="status" value="1" title="已联系">
 					      	{{#  } else { }}
-					      		<input type="radio" name="status" value="1" title="未联系">
-					      	{{#  } }}  
-					      	{{#  if(d.status=='1'){ }}
-					      		<input type="radio" name="status" value="1" title="已联系" checked>
-					      	{{#  } else { }}
-					      		<input type="radio" name="status" value="2" title="已联系">
-					      	{{#  } }}  
+					      		<input type="radio" name="status" value="2" title="未联系">
+								<input type="radio" name="status" value="1" title="已联系" checked>
+					      	{{#  } }}
 					    </div>
 					</div>
 					<div class="layui-inline">
@@ -273,6 +270,7 @@
 					tableObj = obj;
 					var data = obj.data;
 					if(obj.event === 'edit') {
+					var ss = data.reservation_time.split("/");
 						form.render('select',data.times);
 						laytpl(getTpl).render(data, function(html){
 							view.innerHTML = html;
@@ -281,6 +279,7 @@
 			    				elem: '#date1',
 								format: 'yyyy-MM-dd'
 								,type:'date'
+								,value: ss[0]
 								// ,min: 0 //7天前
 								// ,max: 7 //7天后
 			  				});
@@ -295,13 +294,6 @@
 
 				form.on('submit(*)', function(data){
 					// console.log(data.field)
-					// tableObj.update(data.field);
-					// var telephone = data.field.telphone;
-					// var len = telephone.length;
-					// if (len<11) {
-					// 	layer.msg('错误手机号！');
-					// 	return  false;
-					// }
 					$.ajax({
 						type: "get",
 						dataType: "json",

@@ -102,7 +102,10 @@ if ($action=='update'){
     if (empty($idcard)){
         echo  json_encode(['code'=>400,'msg'=>'请输入身份证号！']);
         exit();
+    }elseif (!preg_match('/^[1-9](\d{16}|\d{13})[0-9xX]$/', $idcard)){
+        echo  json_encode(['code'=>400,'msg'=>'请输入正确的身份证号！']);exit();
     }
+
     $check = '/^(1(([35789][0-9])|(47)))\d{8}$/';
     if(!empty($telphone) && !preg_match($check, $telphone)){
         echo  json_encode(['code'=>400,'msg'=>'请输入正确的手机号码！']);
@@ -116,15 +119,17 @@ if ($action=='update'){
         echo json_encode(['code' => 400, 'msg' => '请输入时间！']);
         exit();
     }
+
     $days = $reservation_time;
     $weekarray = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"];
     $week      = $weekarray[date("w",strtotime("$reservation_time"))];
     $reservation_time = $reservation_time.'/'.$week.'/'.$times;
     $days = strtotime($days);
 
-    $Agreement = DB::getStmt("select * from  reservation where reservation_time=:reservation_time");
+    $Agreement = DB::getStmt("select * from  reservation where reservation_time=:reservation_time and id!=:id");
 
     $Agreement->bindParam(':reservation_time',$reservation_time);
+    $Agreement->bindParam(':id',$id);
     $Agreement->execute();
     $a=$Agreement->fetch(PDO::FETCH_ASSOC);
     if ($a){
@@ -132,9 +137,7 @@ if ($action=='update'){
         exit();
     }
 
-
-
-    $sql = "update reservation set  username=:username,idcard=:idcard,reservation_time=:reservation_time,date=:date,times=:times,telphone=:telphone,status=:status,remark=:remark where `id`=:id;";
+    $sql = "update reservation set  username=:username,idcard=:idcard,reservation_time=:reservation_time,date=:date,times=:times,telphone=:telphone,`status`=:status,remark=:remark  where `id`=:id";
     $stmt = DB::getStmt($sql);
     //传参执行
     if($stmt->execute(['username'=>$username,'idcard'=>$idcard,'reservation_time'=>$reservation_time,'date'=>$days,'times'=>$times,'telphone'=>$telphone,'status'=>$status,'remark'=>$remark,'id'=>$id])){

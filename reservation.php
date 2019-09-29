@@ -98,14 +98,27 @@ if ($action=='send'){
     $codes = createSign();
     $telphone = isset($_POST['telphone'])?$_POST['telphone']:"";
     $now = time();
-    if (isset($_SESSION['start'.$telphone]) && $now-$_SESSION['start'.$telphone]<60){
+    $iscode = DB::getStmt("select max(sendtime) as send_time from  code_log where telphone=:telphone");
+    $iscode->bindParam(':telphone',$telphone);
+    $iscode->execute();
+    $is_code=$iscode->fetch(PDO::FETCH_ASSOC);
+    if (!empty($is_code) && $now-$is_code['send_time']<60){
         echo  json_encode(['code'=>400,'msg'=>'请勿频繁发送验证码！']);exit();
+    }else if (!empty($is_code) && $now-$is_code['send_time']>60){
+        $sql = "delete from code_log where telphone=?";
+        $stmt = DB::getStmt($sql);
+        $stmt->bindValue(1,$telphone);
+        $stmt->execute();
     }
     $url = 'http://mysms.house365.com:81/index.php/Interface/apiSendMobil/jid/148/depart/1/city/chuzhou/mobileno/'.$telphone.'/?msg=您的验证码是 【'.$codes.'】';
     $mas = doGet("$url");
     if ($mas){
         $_SESSION['phone'.$telphone] = $codes;
-        $_SESSION['start'.$telphone] = time();
+        $stmtcode = DB::getStmt("insert into code_log  (code,sendtime,telphone) values (?,?,?)");
+        $stmtcode->bindValue(1,$codes);
+        $stmtcode->bindValue(2,time());
+        $stmtcode->bindValue(3,$telphone);
+        $stmtcode->execute();
         echo  json_encode(['code'=>200,'msg'=>'短信已发送，请查收！','datass'=>$mas]);
         exit();
     }else{
@@ -124,7 +137,6 @@ if ($action=='configInit'){
     $Agreement->execute();
     $datas = $Agreement->fetchAll(PDO::FETCH_ASSOC);
 
-    $tmp = array();
     if ($datas){
         foreach ($datas as $k=>$v){
             $divide = explode('/',$v['reservation_time']);
@@ -132,22 +144,24 @@ if ($action=='configInit'){
             $datas[$k]['children'] = $divide[2];
         }
         foreach ($objData as $key=>$val){
-            $tmp[$key]['text']=$val['text'];
-            $tmp[$key]['value']=$val['value'];
             foreach ($datas as $ks=>$vs){
                 if ($val['text']==$vs['text']){
                     foreach ($val['children'] as $kk=>$vv){
                         if ($vv['text']==$vs['children']){
-//                            array_splice($objData[$key]['children'], $kk, 1);
-//                            $objData[$key]['children'][$kk]['value'] = '已经预约';
-//                            $objData[$key]['children'][$kk]['text']  = '已经预约';
                             unset($objData[$key]['children'][$kk]);
                         }
                     }
                 }
             }
+            if (empty($objData[$key]['children'])){
+                unset($objData[$key]);
+                continue;
+            }
+            $objData = array_values($objData);
             $objData[$key]['children'] = array_values($objData[$key]['children']);
         }
+
+
         echo json_encode($objData);exit();
     }
     echo json_encode($objData);
