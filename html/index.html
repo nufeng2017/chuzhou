@@ -205,9 +205,10 @@
 				},
 				url:"../reservation.php?action=send",
 				success:function(data){
+					console.log(data);
 					if (data.code==200){
 						alert(data.msg);
-					} else if (data.code==200){
+					} else if (data.code==400){
 						alert(data.msg);
 					}
 				}

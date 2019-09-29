@@ -12,13 +12,13 @@ if ($action=='error'){
 
 if ($action=='add'){
     $param = $_POST;
-
+    $telphones = isset($param['telphone'])?$param['telphone']:'';
     if (empty($param['username'])){
         echo  json_encode(['code'=>400,'msg'=>'请输入姓名！']);exit();
     }
     if (empty($param['idcard'])){
         echo  json_encode(['code'=>400,'msg'=>'请输入身份证号！']);exit();
-    }elseif (!preg_match("/^\d{15}|\d{18}$/", $param['idcard'])){
+    }elseif (!preg_match('/^[1-9](\d{16}|\d{13})[0-9xX]$/', $param['idcard'])){
         echo  json_encode(['code'=>400,'msg'=>'请输入正确的身份证号！']);exit();
     }
     if (empty($param['time'])){
@@ -33,10 +33,11 @@ if ($action=='add'){
     if (empty($param['code'])){
         echo  json_encode(['code'=>400,'msg'=>'请输入正确的验证码！']);exit();
     }
-    if (!isset($_SESSION[$param['telphone']])){
+
+    if (!isset($_SESSION['phone'.$telphones])){
         echo  json_encode(['code'=>400,'msg'=>'您还没发送验证码！']);exit();
     }
-    $tel = $_SESSION[$param['telphone']];
+    $tel = $_SESSION['phone'.$telphones];
     $tel = isset($tel)?$tel:"";
     if ($tel!=$param['code']){
         echo  json_encode(['code'=>400,'msg'=>'验证码错误！']);exit();
@@ -73,7 +74,7 @@ if ($action=='add'){
 
     if($insert_id)
     {
-        unset($_SESSION[$param['telphone']]);
+        unset($_SESSION['phone'.$telphones]);
         $successDate = 'submit_success.html?username='.$param['username'].'&idcard='.$param['idcard'].'&time='.$param['time'].'&telphone='.$param['telphone'];
         echo json_encode(['code'=>200,'msg'=>'预约成功！','urll'=>$successDate]);
     }
@@ -96,11 +97,11 @@ if ($action=='send'){
     $url = 'http://mysms.house365.com:81/index.php/Interface/apiSendMobil/jid/148/depart/1/city/chuzhou/mobileno/'.$telphone.'/?msg=您的验证码是 【'.$codes.'】';
     $mas = doGet("$url");
     if ($mas){
-        $_SESSION[$telphone] = $codes;
-        echo  json_encode(['code'=>200,'msg'=>'短信已发送，请查收！']);
+        $_SESSION['phone'.$telphone] = $codes;
+        echo  json_encode(['code'=>200,'msg'=>'短信已发送，请查收！','datass'=>$mas]);
         exit();
     }else{
-        echo  json_encode(['code'=>400,'msg'=>'发送失败，请联系客服！']);
+        echo  json_encode(['code'=>400,'msg'=>'发送失败，请联系客服！','datass'=>$mas]);
         exit();
     }
 }
