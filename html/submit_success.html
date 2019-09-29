@@ -61,7 +61,7 @@
 			res[arr[i].split("=")[0]] = arr[i].split("=")[1]
 		}
 	}
-	document.getElementById("username").innerHTML = res.username;
+	document.getElementById("username").innerHTML = decodeURI(res.username);
 	document.getElementById("idcard").innerHTML = res.idcard;
 	document.getElementById("time").innerHTML = decodeURI(res.time);
 	document.getElementById("telphone").innerHTML = res.telphone;

@@ -52,7 +52,7 @@ if ($action=='add'){
     $Agreement->execute();
     $a=$Agreement->fetch(PDO::FETCH_ASSOC);
     if ($a){
-        echo  json_encode(['code'=>400,'msg'=>'请重新选择预约时间！']);
+        echo  json_encode(['code'=>400,'msg'=>'时间已经被预约，请重新选择！']);
         exit();
     }
 
@@ -75,6 +75,9 @@ if ($action=='add'){
     if($insert_id)
     {
         unset($_SESSION['phone'.$telphones]);
+        $notice = '恭喜您，预约成功！请于 '.$param['time'].'（预约时间）前往不动产办理中心办理业务，如未按预约时间到达，请现场重新排队取号。如有疑问可拨打0550-3055300咨询。感谢您的理解和支持！';
+        $smsurl = 'http://mysms.house365.com:81/index.php/Interface/apiSendMobil/jid/148/depart/1/city/chuzhou/mobileno/'.$param['telphone'].'/?msg='.$notice;
+        doGet("$smsurl");
         $successDate = 'submit_success.html?username='.$param['username'].'&idcard='.$param['idcard'].'&time='.$param['time'].'&telphone='.$param['telphone'];
         echo json_encode(['code'=>200,'msg'=>'预约成功！','urll'=>$successDate]);
     }
@@ -94,10 +97,15 @@ if ($action=='add'){
 if ($action=='send'){
     $codes = createSign();
     $telphone = isset($_POST['telphone'])?$_POST['telphone']:"";
+    $now = time();
+    if (isset($_SESSION['start'.$telphone]) && $now-$_SESSION['start'.$telphone]<60){
+        echo  json_encode(['code'=>400,'msg'=>'请勿频繁发送验证码！']);exit();
+    }
     $url = 'http://mysms.house365.com:81/index.php/Interface/apiSendMobil/jid/148/depart/1/city/chuzhou/mobileno/'.$telphone.'/?msg=您的验证码是 【'.$codes.'】';
     $mas = doGet("$url");
     if ($mas){
         $_SESSION['phone'.$telphone] = $codes;
+        $_SESSION['start'.$telphone] = time();
         echo  json_encode(['code'=>200,'msg'=>'短信已发送，请查收！','datass'=>$mas]);
         exit();
     }else{
