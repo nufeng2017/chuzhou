@@ -4,12 +4,16 @@ include "function.php";
 session_start();
 
 $action = isset($_GET['action'])?$_GET['action']:"error";
-
+/**
+ * 判断方法参数
+ */
 if ($action=='error'){
 
     echo json_encode(['code'=>400,'msg'=>'缺少必须参数！']);exit();
 }
-
+/**
+ * 添加数据验证入库
+ */
 if ($action=='add'){
     $param = $_POST;
     $telphones = isset($param['telphone'])?$param['telphone']:'';
@@ -93,10 +97,17 @@ if ($action=='add'){
     exit();
 }
 
-
+/**
+ * 验证码存库，进行60秒的发送限制  业务
+ */
 if ($action=='send'){
     $codes = createSign();
     $telphone = isset($_POST['telphone'])?$_POST['telphone']:"";
+    if(empty($telphone)){
+        echo  json_encode(['code'=>400,'msg'=>'请输入手机号码！']);exit();
+    }elseif (!preg_match('/^(1(([35789][0-9])|(47)))\d{8}$/', $telphone)){
+        echo  json_encode(['code'=>400,'msg'=>'请输入正确的手机号码！']);exit();
+    }
     $now = time();
     $iscode = DB::getStmt("select max(sendtime) as send_time from  code_log where telphone=:telphone");
     $iscode->bindParam(':telphone',$telphone);
@@ -110,6 +121,7 @@ if ($action=='send'){
         $stmt->bindValue(1,$telphone);
         $stmt->execute();
     }
+
     $url = 'http://mysms.house365.com:81/index.php/Interface/apiSendMobil/jid/148/depart/1/city/chuzhou/mobileno/'.$telphone.'/?msg=您的验证码是 【'.$codes.'】';
     $mas = doGet("$url");
     if ($mas){
@@ -127,6 +139,9 @@ if ($action=='send'){
     }
 }
 
+/**
+ * 进入页面加载系统数据
+ */
 if ($action=='configInit'){
     $obj = $_POST;
     $objData  = $_POST['obj'];
